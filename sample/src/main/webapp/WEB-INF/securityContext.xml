@@ -86,15 +86,81 @@
     <bean id="samlLogger" class="org.springframework.security.saml.log.SAMLDefaultLogger"/>
 
     <!-- Central storage of cryptographic keys -->
-    <bean id="keyManager" class="org.springframework.security.saml.key.JKSKeyManager">
-        <constructor-arg value="classpath:security/samlKeystore.jks"/>
-        <constructor-arg type="java.lang.String" value="nalle123"/>
+    <!--<bean id="keyManager" class="org.springframework.security.saml.key.JKSKeyManager">-->
+        <!--<constructor-arg value="classpath:security/samlKeystore.jks"/>-->
+        <!--<constructor-arg type="java.lang.String" value="nalle123"/>-->
+        <!--<constructor-arg>-->
+            <!--<map>-->
+                <!--<entry key="apollo" value="nalle123"/>-->
+            <!--</map>-->
+        <!--</constructor-arg>-->
+        <!--<constructor-arg type="java.lang.String" value="apollo"/>-->
+    <!--</bean>-->
+    <!--<bean id="keyManager" class="org.springframework.security.saml.key.JKSKeyManager">-->
+        <!--<constructor-arg value="classpath:security/samlKeystore2.jks"/>-->
+        <!--<constructor-arg type="java.lang.String" value="nalle123"/>-->
+        <!--<constructor-arg>-->
+            <!--<map>-->
+                <!--<entry key="apollo" value="nalle123"/>-->
+            <!--</map>-->
+        <!--</constructor-arg>-->
+        <!--<constructor-arg type="java.lang.String" value="apollo"/>-->
+    <!--</bean>-->
+
+    <bean id="keyManager"  class="org.springframework.security.saml.web.ChainedKeyManager">
         <constructor-arg>
-            <map>
-                <entry key="apollo" value="nalle123"/>
-            </map>
+            <list>
+                <bean class="org.springframework.security.saml.key.JKSKeyManager">
+                    <constructor-arg value="classpath:security/samlKeystore.jks"/>
+                    <constructor-arg type="java.lang.String" value="nalle123"/>
+                    <constructor-arg>
+                        <map>
+                            <entry key="apollo" value="nalle123"/>
+                        </map>
+                    </constructor-arg>
+                    <constructor-arg type="java.lang.String" value="apollo"/>
+                </bean>
+                <!--<bean class="org.springframework.security.saml.key.JKSKeyManager">-->
+                    <!--<constructor-arg value="classpath:security/samlKeystore2.jks"/>-->
+                    <!--<constructor-arg type="java.lang.String" value="password"/>-->
+                    <!--<constructor-arg>-->
+                        <!--<map>-->
+                            <!--<entry key="mykey" value="password"/>-->
+                        <!--</map>-->
+                    <!--</constructor-arg>-->
+                    <!--<constructor-arg type="java.lang.String" value="mykey"/>-->
+                <!--</bean>-->
+                <bean class="org.springframework.security.saml.web.DatabaseTrustedKeyManager">
+                    <constructor-arg>
+                        <bean class="org.springframework.security.saml.web.InMemX509Repository">
+                            <constructor-arg>
+                                <map>
+                                    <entry key="theTrustedKey" value="-----BEGIN CERTIFICATE-----
+MIIDDjCCAfagAwIBAgIQf/r4nK5+P4NBCNHL/yXSjDANBgkqhkiG9w0BAQsFADBD
+MUEwPwYDVQQDEzhBREZTIFNpZ25pbmcgLSBXSU4tSlBJQkNMQk9KSkIuY29ycC5j
+b250cmFzdHNlY3VyaXR5LmNvbTAeFw0xNzA4MjIxNzMwNThaFw0xODA4MjIxNzMw
+NThaMEMxQTA/BgNVBAMTOEFERlMgU2lnbmluZyAtIFdJTi1KUElCQ0xCT0pKQi5j
+b3JwLmNvbnRyYXN0c2VjdXJpdHkuY29tMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8A
+MIIBCgKCAQEAwJLue+kv0Q2aLK0C5zX9Xu39ffWJlM0AkuMbBqhLYNSAFBCCPVJx
+6yRbsgMOuPEVKN9DyAY7lppC3tT6cBXMS+pOx7K+Q1np448SVnoedOvkf5q5K95S
+0zWJZ0BxpNCm6FEUt3O0Kat/A2Lp+pEnPS1oipHOqBy+DGi73j6F8yd9GbYaSbaK
+hPteynRRAbkiYNX5QxILWrzuLBwd9QSVwfy6Qlac4dFPiRflT/xX2xYS5mUaFNUe
+WOxnd/xLNVTrSEDvHtvG6c79HQ61MZcTpgNf0+hz7zbomdj57v0k0YpW9ZKkraRU
+TBxiRRzvG6bgj6qAmwwv0IGvh2A7xhPAbQIDAQABMA0GCSqGSIb3DQEBCwUAA4IB
+AQAY04UDrj33aH5qpkonhB8PG0AX/SPyDhi8wIeug4LxFURxEFXdWVgB1byBda54
+UWCWRLH2D9CJj5aBdsUMsOmnyFzO3sdYgMyEBUyEy/K/Fnz+TMhJcPS86XQIeaoX
+w/pSIdHCyvsZ5An7nGKasSciMocIwoDXfXmM4C8HJbWkYBjPsWD60oV+QpaWCZfj
+wzuHeFmVehXiDQNR7faJ+CtJiKN5rdmbvAd6tk13aT6mnkOr8WBf64KjIl1JQdDx
+eKgo57oB7FacH7AptvqpMVo7RxgGboq/bFrcli4BjISY/jxnAD1s83e2SawQPTdi
+jEOuNm+D3Jiyfbm184ksK5Wi
+-----END CERTIFICATE-----"/>
+                                </map>
+                            </constructor-arg>
+                        </bean>
+                    </constructor-arg>
+                </bean>
+            </list>
         </constructor-arg>
-        <constructor-arg type="java.lang.String" value="apollo"/>
     </bean>
 
     <!-- Entry point to initialize authentication, default values taken from properties file -->
@@ -147,7 +213,8 @@
                             </constructor-arg>
                             <constructor-arg>
                                 <bean class="org.opensaml.util.resource.ClasspathResource">
-                                    <constructor-arg value="/metadata/idp.xml"/>
+                                    <!--<constructor-arg value="/metadata/idp.xml"/>-->
+                                    <constructor-arg value="/metadata/FederationMetadata.xml"/>
                                 </bean>
                             </constructor-arg>
                             <property name="parserPool" ref="parserPool"/>
